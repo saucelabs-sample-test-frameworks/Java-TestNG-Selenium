@@ -9,10 +9,8 @@
 ### Environment Setup
 
 1. Global Dependencies
-    * Install Maven
-    	https://maven.apache.org/install.html
-    * Or Install Maven with Homebrew
-    	http://brew.sh/
+    * [Install Maven](https://maven.apache.org/install.html)
+    * Or Install Maven with [Homebrew](http://brew.sh/)
     ```
     $ brew install maven
     ```
@@ -38,6 +36,7 @@ Tests in Parallel:
 	```
 	$ mvn test
 	```
+
 [Sauce Labs Dashboard](https://saucelabs.com/beta/dashboard/)
 
 ### Advice/Troubleshooting
