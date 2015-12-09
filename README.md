@@ -28,7 +28,7 @@
 	$ cd Java-Junit-Selenium
 	$ mvn test-compile
 	```
-	* You may also want to run the command below to check for outdated dependencies. Please be sure to verify and review updates. They may or may not be compatible with your code.
+	* You may also want to run the command below to check for outdated dependencies. Please be sure to verify and review updates before editing your pom.xml file. The updated packages may or may not be compatible with your code.
 	```
 	$ mvn versions:display-dependency-updates
 	```
@@ -38,24 +38,19 @@ Tests in Parallel:
 	```
 	$ mvn test
 	```
-Sauce Labs Dashboard:
-https://saucelabs.com/beta/dashboard/
+[Sauce Labs Dashboard](https://saucelabs.com/beta/dashboard/)
 
 ### Advice/Troubleshooting
 1. It may be useful to use a Java IDE such as IntelliJ or Eclipse to help troubleshoot potential issues. 
 
 ### Resources
-##### Sauce Labs Documentation: 
-* https://wiki.saucelabs.com/
+##### [Sauce Labs Documentation](https://wiki.saucelabs.com/)
 
-##### SeleniumHQ Documentation:
-* http://www.seleniumhq.org/docs/
+##### [SeleniumHQ Documentation](http://www.seleniumhq.org/docs/)
 
-##### TestNg Documentation: 
-* http://testng.org/javadocs/index.html
+##### [TestNg Documentation](http://testng.org/javadocs/index.html)
 
-##### Java Documentation: 
-* https://docs.oracle.com/javase/7/docs/api/
+##### [Java Documentation](https://docs.oracle.com/javase/7/docs/api/)
 
 ##### Stack Overflow:
 * [Related Stack Overflow Threads](http://stackoverflow.com/questions/27355003/advise-on-hierarchy-for-element-locators-in-selenium-webdriver)
