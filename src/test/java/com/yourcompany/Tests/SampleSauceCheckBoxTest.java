@@ -2,6 +2,7 @@ package com.yourcompany.Tests;
 
 import com.yourcompany.Pages.GuineaPigPage;
 
+import com.yourcompany.Utils.RetryAnalyzer;
 import org.testng.annotations.Test;
 
 import com.yourcompany.Pages.GuineaPigPage;
@@ -10,6 +11,7 @@ import com.yourcompany.Tests.SampleSauceTestBase;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
+import org.testng.util.RetryAnalyzerCount;
 
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -58,7 +60,7 @@ public class SampleSauceCheckBoxTest extends SampleSauceTestBase {
      * Runs a simple test verifying the checked checkbox state
      * @throws InvalidElementStateException
      */
-    @Test(dataProvider = "hardCodedBrowsers")
+    @Test(dataProvider = "hardCodedBrowsers", retryAnalyzer = RetryAnalyzer.class)
     public void verifyCheckedCheckBoxInputTest(String browser, String version, String os, Method method)
             throws MalformedURLException, InvalidElementStateException, UnexpectedException {
 
