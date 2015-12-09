@@ -1,8 +1,4 @@
-package com.yourcompany;
-
-/**
- * @author Neil Manvar
- */
+package com.yourcompany.Tests;
 
 // import Sauce TestNG helper libraries
 import com.saucelabs.common.SauceOnDemandAuthentication;
@@ -10,17 +6,14 @@ import com.saucelabs.common.SauceOnDemandSessionIdProvider;
 import com.saucelabs.testng.SauceOnDemandAuthenticationProvider;
 import com.saucelabs.testng.SauceOnDemandTestListener;
 
-// import selenium libraries
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-// import testng libraries
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
+// import testng annotations
+import org.testng.annotations.*;
+
 import static org.testng.Assert.*;
 
 // import java libraries
@@ -28,17 +21,20 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-// import page objects
-import com.yourcompany.Pages.*;
-
-
 /**
  * Simple TestNG test which demonstrates being instantiated via a DataProvider in order to supply multiple browser combinations.
  *
  * @author Neil Manvar
  */
 @Listeners({SauceOnDemandTestListener.class})
-public class SampleSauceTest implements SauceOnDemandSessionIdProvider, SauceOnDemandAuthenticationProvider {
+public class SampleSauceTestBase implements SauceOnDemandSessionIdProvider, SauceOnDemandAuthenticationProvider  {
+
+    // Selenium URI -- static same for everyone.
+    public static String seleniumURI = null;
+
+    // Selenium URI -- static same for everyone
+    public static String buildTag = null;
+
 
     // Sauce username
     public String username = System.getenv("SAUCE_USERNAME");
@@ -77,7 +73,7 @@ public class SampleSauceTest implements SauceOnDemandSessionIdProvider, SauceOnD
                 new Object[]{"firefox", "35", "Windows 7"}
         };
     }
-    
+
     /**
      * @return the {@link WebDriver} for the current thread
      */
@@ -114,7 +110,7 @@ public class SampleSauceTest implements SauceOnDemandSessionIdProvider, SauceOnD
      * @return
      * @throws MalformedURLException if an error occurs parsing the url
      */
-    private WebDriver createDriver(String browser, String version, String os, String methodName) throws MalformedURLException {
+    protected WebDriver createDriver(String browser, String version, String os, String methodName) throws MalformedURLException {
         DesiredCapabilities capabilities = new DesiredCapabilities();
 
         // set desired capabilities to launch appropriate browser on Sauce
@@ -123,12 +119,16 @@ public class SampleSauceTest implements SauceOnDemandSessionIdProvider, SauceOnD
         capabilities.setCapability(CapabilityType.PLATFORM, os);
         capabilities.setCapability("name", methodName);
 
+        if (buildTag != null) {
+            capabilities.setCapability("build", buildTag);
+        }
+
         // Launch remote browser and set it as the current thread
         webDriver.set(new RemoteWebDriver(
-                new URL("http://" + authentication.getUsername() + ":" + authentication.getAccessKey() + "@ondemand.saucelabs.com:80/wd/hub"),
+                new URL("http://" + authentication.getUsername() + ":" + authentication.getAccessKey() + seleniumURI +"/wd/hub"),
                 capabilities));
 
-        // set current sessionId        
+        // set current sessionId
         String id = ((RemoteWebDriver) getWebDriver()).getSessionId().toString();
         sessionId.set(id);
 
@@ -137,7 +137,7 @@ public class SampleSauceTest implements SauceOnDemandSessionIdProvider, SauceOnD
 
         return webDriver.get();
     }
-    
+
     /**
      * Method that gets invoked after test.
      * Closes the browser
@@ -150,47 +150,21 @@ public class SampleSauceTest implements SauceOnDemandSessionIdProvider, SauceOnD
         webDriver.get().quit();
     }
 
-    /**
-     * Runs a simple test verifying inputField can typed into.
-     *
-     * @param browser
-     * @param version Represents the version of the browser to be used as part of the test run.
-     * @param os Represents the operating system to be used as part of the test run.
-     * @param method Represents the name of the test.
-     * @throws Exception if an error occurs during the running of the test
-     */
-    @Test(dataProvider = "hardCodedBrowsers")
-    public void verifyEmailInputTest(String browser, String version, String os, Method method) throws Exception {
-        // all variable declarations should be at top of method
-        WebDriver driver = createDriver(browser, version, os, method.getName());  // create the driver / browser instance
-        String emailInputText = "abc@gmail.com";
-        
-        
-        /*
-         actions and interaction with page should go here...
-        */
-        driver.get("https://saucelabs.com/test/guinea-pig");
+    @BeforeSuite
+    public void setupSuite(){
+        //
 
-        /*
-         Use page object pattern to interact with application under test.
-
-             Page object will have public methods represent the "services" that the page offers.
-             Page object will also contain the internals of the app (selectors / locators), which will
-                 which can be accessed or ainteracted with via a "service"
-        */
-        GuineaPigPage page = new GuineaPigPage(driver);
-
-        /*
-         fillOutEmailInput page is an exposed "service",
-             which interacts with the email input field element by sending text to it.
-        */
-        page.fillOutEmailInput(emailInputText);
-
-        /*
-         Assertions should be part of test and not part of Page object.
-         Each test should be verifying one piece of functionality (atomic testing)
-        */
-        assertEquals(page.getEmailInput(), emailInputText);
+        //While running in CI, if Sauce Connect is running the SELENIUM_PORT env var will be set.
+        String seleniumPort = System.getenv("SELENIUM_PORT");
+        if (seleniumPort == null){
+            //use direct access
+            seleniumURI = "@ondemand.saucelabs.com:80";
+        } else {
+            //use SC relay port
+            seleniumURI = String.format("@localhost:%s", seleniumPort);
+        }
+        //If available add build tag. When running under Jenkins BUILD_TAG is automatically set.
+        //You can set this manually on manual runs.
+        buildTag = System.getenv("BUILD_TAG");
     }
-
 }
