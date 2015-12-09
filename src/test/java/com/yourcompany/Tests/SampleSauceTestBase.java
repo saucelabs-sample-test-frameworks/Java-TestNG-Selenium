@@ -6,7 +6,9 @@ import com.saucelabs.common.SauceOnDemandSessionIdProvider;
 import com.saucelabs.testng.SauceOnDemandAuthenticationProvider;
 import com.saucelabs.testng.SauceOnDemandTestListener;
 
+import com.yourcompany.Utils.SeleniumBrowserLogHelper;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -14,12 +16,12 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 // import testng annotations
 import org.testng.annotations.*;
 
-import static org.testng.Assert.*;
-
 // import java libraries
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.rmi.UnexpectedException;
+import java.util.logging.Level;
 
 /**
  * Simple TestNG test which demonstrates being instantiated via a DataProvider in order to supply multiple browser combinations.
@@ -70,7 +72,8 @@ public class SampleSauceTestBase implements SauceOnDemandSessionIdProvider, Sauc
                 new Object[]{"internet explorer", "11", "Windows 8.1"},
                 new Object[]{"chrome", "41", "Windows XP"},
                 new Object[]{"safari", "7", "OS X 10.9"},
-                new Object[]{"firefox", "35", "Windows 7"}
+                new Object[]{"firefox", "35", "Windows 7"},
+                new Object[]{"opera", "12.12", "Windows 7"}
         };
     }
 
@@ -110,7 +113,8 @@ public class SampleSauceTestBase implements SauceOnDemandSessionIdProvider, Sauc
      * @return
      * @throws MalformedURLException if an error occurs parsing the url
      */
-    protected WebDriver createDriver(String browser, String version, String os, String methodName) throws MalformedURLException {
+    protected WebDriver createDriver(String browser, String version, String os, String methodName)
+            throws MalformedURLException, UnexpectedException {
         DesiredCapabilities capabilities = new DesiredCapabilities();
 
         // set desired capabilities to launch appropriate browser on Sauce
@@ -124,6 +128,7 @@ public class SampleSauceTestBase implements SauceOnDemandSessionIdProvider, Sauc
         }
 
         // Launch remote browser and set it as the current thread
+        SeleniumBrowserLogHelper.setLogCapabilities(capabilities, Level.ALL);
         webDriver.set(new RemoteWebDriver(
                 new URL("http://" + authentication.getUsername() + ":" + authentication.getAccessKey() + seleniumURI +"/wd/hub"),
                 capabilities));
@@ -140,13 +145,14 @@ public class SampleSauceTestBase implements SauceOnDemandSessionIdProvider, Sauc
 
     /**
      * Method that gets invoked after test.
+     * Dumps browser log and
      * Closes the browser
-     *
-     * @param testMethod
-     * @return
      */
     @AfterMethod
     public void tearDown() throws Exception {
+
+        //Gets browser logs if available.
+        SeleniumBrowserLogHelper.getLogsCommandWrapper(webDriver.get(), LogType.BROWSER);
         webDriver.get().quit();
     }
 

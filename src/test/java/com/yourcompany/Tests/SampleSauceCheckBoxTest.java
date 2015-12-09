@@ -13,6 +13,7 @@ import org.openqa.selenium.support.PageFactory;
 
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.rmi.UnexpectedException;
 
 import static org.junit.Assert.*;
 
@@ -28,7 +29,7 @@ public class SampleSauceCheckBoxTest extends SampleSauceTestBase {
      */
     @Test(dataProvider = "hardCodedBrowsers")
     public void verifyUncheckedCheckBoxInputTest(String browser, String version, String os, Method method)
-            throws MalformedURLException, InvalidElementStateException {
+            throws MalformedURLException, InvalidElementStateException, UnexpectedException {
 
         //create webdriver session
         WebDriver driver = createDriver(browser, version, os, method.getName());
@@ -59,7 +60,7 @@ public class SampleSauceCheckBoxTest extends SampleSauceTestBase {
      */
     @Test(dataProvider = "hardCodedBrowsers")
     public void verifyCheckedCheckBoxInputTest(String browser, String version, String os, Method method)
-            throws MalformedURLException, InvalidElementStateException {
+            throws MalformedURLException, InvalidElementStateException, UnexpectedException {
 
         //create webdriver session
         WebDriver driver = createDriver(browser, version, os, method.getName());

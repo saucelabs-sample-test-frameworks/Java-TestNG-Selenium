@@ -9,6 +9,7 @@ import org.openqa.selenium.WebDriver;
 
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.rmi.UnexpectedException;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -26,7 +27,7 @@ public class SampleSauceTextInputTest extends SampleSauceTestBase {
      */
     @org.testng.annotations.Test(dataProvider = "hardCodedBrowsers")
     public void verifyEmailInputTest(String browser, String version, String os, Method method)
-            throws MalformedURLException, InvalidElementStateException {
+            throws MalformedURLException, InvalidElementStateException, UnexpectedException {
         String emailInputText = "abc@gmail.com";
         WebDriver driver = createDriver(browser, version, os, method.getName());
         // Navigate to the page
@@ -55,7 +56,7 @@ public class SampleSauceTextInputTest extends SampleSauceTestBase {
      */
     @org.testng.annotations.Test(dataProvider = "hardCodedBrowsers")
     public void verifyCommentInputTest(String browser, String version, String os, Method method)
-            throws MalformedURLException, InvalidElementStateException {
+            throws MalformedURLException, InvalidElementStateException, UnexpectedException {
         String commentInputText = UUID.randomUUID().toString();
 
         WebDriver driver = createDriver(browser, version, os, method.getName());

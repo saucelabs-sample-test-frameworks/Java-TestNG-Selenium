@@ -8,7 +8,8 @@ public class PageBase {
 
     protected static void setCheckCheckBoxState(WebElement checkBox, boolean checked)
             throws InvalidElementStateException {
-        if (!checkBox.getAttribute("type").contentEquals("checkbox") || !checkBox.getTagName().contentEquals("input")){
+        if (!checkBox.getAttribute("type").contentEquals("checkbox") ||
+                !checkBox.getTagName().toLowerCase().contentEquals("input")){
             throw new InvalidElementStateException("This web element is not a checkbox!");
         }
         //we may wanna check if it is displayed and enabled, when performing actions.
@@ -36,7 +37,8 @@ public class PageBase {
     }
 
     protected static void clickButton(WebElement button) throws InvalidElementStateException{
-        if (!button.getAttribute("type").contentEquals("submit") || !button.getTagName().contentEquals("input")){
+        if (!button.getAttribute("type").contentEquals("submit") ||
+                !button.getTagName().toLowerCase().contentEquals("input")){
             throw new InvalidElementStateException("This web element is not a button input!");
         }
         //we may wanna check if it is displayed and enabled, when performing actions.
@@ -52,7 +54,7 @@ public class PageBase {
     private static void setTextElementText(WebElement textElement, String textInputType, String tag, String value)
             throws InvalidElementStateException {
         if (!textElement.getAttribute("type").contentEquals(textInputType) ||
-                !textElement.getTagName().contentEquals(tag)){
+                !textElement.getTagName().toLowerCase().contentEquals(tag)){
             throw new InvalidElementStateException("This web element is not a text input!");
         }
         //we may wanna check if it is displayed and enabled, when performing actions.
