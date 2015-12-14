@@ -6,7 +6,7 @@ import com.saucelabs.common.SauceOnDemandSessionIdProvider;
 import com.saucelabs.testng.SauceOnDemandAuthenticationProvider;
 import com.saucelabs.testng.SauceOnDemandTestListener;
 
-import com.yourcompany.Utils.SeleniumBrowserLogHelper;
+import com.yourcompany.Utils.SauceHelpers;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.remote.CapabilityType;
@@ -128,7 +128,7 @@ public class SampleSauceTestBase implements SauceOnDemandSessionIdProvider, Sauc
         }
 
         // Launch remote browser and set it as the current thread
-        SeleniumBrowserLogHelper.setLogCapabilities(capabilities, Level.ALL);
+        SauceHelpers.setLogCapabilities(capabilities, Level.ALL);
         webDriver.set(new RemoteWebDriver(
                 new URL("http://" + authentication.getUsername() + ":" + authentication.getAccessKey() + seleniumURI +"/wd/hub"),
                 capabilities));
@@ -152,23 +152,14 @@ public class SampleSauceTestBase implements SauceOnDemandSessionIdProvider, Sauc
     public void tearDown() throws Exception {
 
         //Gets browser logs if available.
-        SeleniumBrowserLogHelper.getLogsCommandWrapper(webDriver.get(), LogType.BROWSER);
+        SauceHelpers.getLogsCommandWrapper(webDriver.get(), LogType.BROWSER);
         webDriver.get().quit();
     }
 
     @BeforeSuite
     public void setupSuite(){
-        //
-
-        //While running in CI, if Sauce Connect is running the SELENIUM_PORT env var will be set.
-        String seleniumPort = System.getenv("SELENIUM_PORT");
-        if (seleniumPort == null){
-            //use direct access
-            seleniumURI = "@ondemand.saucelabs.com:80";
-        } else {
-            //use SC relay port
-            seleniumURI = String.format("@localhost:%s", seleniumPort);
-        }
+        //get the uri to send the commands to.
+        seleniumURI = SauceHelpers.buildSauceUri();
         //If available add build tag. When running under Jenkins BUILD_TAG is automatically set.
         //You can set this manually on manual runs.
         buildTag = System.getenv("BUILD_TAG");

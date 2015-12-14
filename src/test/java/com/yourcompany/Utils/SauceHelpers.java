@@ -16,7 +16,14 @@ import java.util.logging.Level;
 /**
  * Created by mehmetgerceker on 12/9/15.
  */
-public class SeleniumBrowserLogHelper {
+public class SauceHelpers {
+
+    /**
+     * Per browser setup for collecting console logs.
+     * @param capabilities the desired capabilities object to add the capabilities to
+     * @param logLevel log level for the browser logs to be collected.
+     * @throws UnexpectedException Oh well something unexpected happened!
+     */
     public static void setLogCapabilities(DesiredCapabilities capabilities, Level logLevel)
             throws UnexpectedException{
 
@@ -73,6 +80,12 @@ public class SeleniumBrowserLogHelper {
 
         }
     }
+
+    /**
+     * Wraps the log command to Se around to only send it to supported browsers.
+     * @param driver driver object to be wrapped
+     * @param logType log type to be requested.
+     */
     public static void getLogsCommandWrapper(WebDriver driver, String logType) {
 
         String browser = ((RemoteWebDriver)driver).getCapabilities().getBrowserName();
@@ -82,5 +95,31 @@ public class SeleniumBrowserLogHelper {
         } else {
             System.out.printf("Console log for browser: %s is not supported!\n", browser);
         }
+    }
+    /**
+     * Will generate the URI that will be used to send commands to the Se instance.
+     * If SauceConnect tunnel in use and not directed not to use it will use the SC command relay.
+     *
+     * @param doNotUseSauceConnectCmdRelay Even if available do not use the relay.
+     * @return String formatted uri for Sauce Se commands.
+     */
+    public static String buildSauceUri(boolean doNotUseSauceConnectCmdRelay) {
+        String seleniumURI = "@ondemand.saucelabs.com:80";
+        String seleniumPort = System.getenv("SELENIUM_PORT");
+        if (!doNotUseSauceConnectCmdRelay && seleniumPort != null) {
+            //While running in CI, if Sauce Connect is running the SELENIUM_PORT env var will be set.
+            //use SC relay port
+            seleniumURI = String.format("@localhost:%s", seleniumPort);
+
+        }
+        return seleniumURI;
+    }
+    /**
+     * Will generate the URI that will be used to send commands to the Se instance.
+     * If SauceConnect tunnel in use it will use the SC command relay.
+     * @return String formatted uri for Sauce Se commands.
+     */
+    public static String buildSauceUri() {
+        return buildSauceUri(false);
     }
 }
