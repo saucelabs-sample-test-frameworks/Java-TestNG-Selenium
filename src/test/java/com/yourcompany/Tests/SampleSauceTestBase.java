@@ -128,7 +128,6 @@ public class SampleSauceTestBase implements SauceOnDemandSessionIdProvider, Sauc
         }
 
         // Launch remote browser and set it as the current thread
-        SauceHelpers.setLogCapabilities(capabilities, Level.ALL);
         webDriver.set(new RemoteWebDriver(
                 new URL("http://" + authentication.getUsername() + ":" + authentication.getAccessKey() + seleniumURI +"/wd/hub"),
                 capabilities));
@@ -152,7 +151,6 @@ public class SampleSauceTestBase implements SauceOnDemandSessionIdProvider, Sauc
     public void tearDown() throws Exception {
 
         //Gets browser logs if available.
-        SauceHelpers.getLogsCommandWrapper(webDriver.get(), LogType.BROWSER);
         webDriver.get().quit();
     }
 
