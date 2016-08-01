@@ -3,10 +3,6 @@ jdk:
   - oraclejdk8
   - oraclejdk7
   - openjdk6
-before_install:
-  - export | grep SAUCE_
-before_script:
-  - export | grep SAUCE_
 env:
   global:
     - SAUCE_USERNAME=sauce_examples
