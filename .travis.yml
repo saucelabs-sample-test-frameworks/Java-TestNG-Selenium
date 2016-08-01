@@ -5,6 +5,8 @@ jdk:
   - openjdk6
 before_install:
   - export | grep SAUCE_
+before_script:
+  - export | grep SAUCE_
 env:
   global:
     - SAUCE_USER_NAME=sauce_examples
