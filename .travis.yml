@@ -2,6 +2,9 @@ language: java
 jdk:
   - oraclejdk8
   - oraclejdk7
+# Show the jwt token, as we aint afraid of no leakage
+before_install:
+  - export | grep SAUCE_
 env:
   global:
     - SAUCE_USERNAME=sauce_examples
