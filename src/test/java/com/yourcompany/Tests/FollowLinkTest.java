@@ -1,47 +1,42 @@
 package com.yourcompany.Tests;
 
-import com.yourcompany.Pages.AnotherPage;
 import com.yourcompany.Pages.GuineaPigPage;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.PageFactory;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.rmi.UnexpectedException;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * Created by mehmetgerceker on 12/7/15.
  */
 
-public class SampleSauceFollowLinkTest extends SampleSauceTestBase {
+public class FollowLinkTest extends TestBase {
 
     /**
-     * Runs a simple test verifying the checked checkbox state
+     * Runs a simple test verifying link can be followed.
      *
      * @throws InvalidElementStateException
      */
     @Test(dataProvider = "hardCodedBrowsers")
-    public void verifyUncheckedCheckBoxInputTest(String browser, String version, String os, Method method)
+    public void verifyLinkTest(String browser, String version, String os, Method method)
             throws MalformedURLException, InvalidElementStateException, UnexpectedException {
 
         //create webdriver session
         this.createDriver(browser, version, os, method.getName());
         WebDriver driver = this.getWebDriver();
 
-        // initialize page object
-        GuineaPigPage gpage = PageFactory.initElements(driver, GuineaPigPage.class);
+        this.annotate("Visiting GuineaPig page...");
+        GuineaPigPage page = GuineaPigPage.visitPage(driver);
 
-        gpage.visitPage();
-        gpage.followLink();
+        this.annotate("Clicking on link...");
+        page.followLink();
 
-        AnotherPage apage = PageFactory.initElements(driver, AnotherPage.class);
-
-        assertEquals(apage.title, apage.getTitle(driver));
-
+        this.annotate("Asserting that we are on a new page...");
+        Assert.assertFalse(page.isOnPage());
     }
 
 }

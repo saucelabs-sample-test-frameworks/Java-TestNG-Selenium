@@ -3,14 +3,11 @@ package com.yourcompany.Pages;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-/**
- * Created by mehmetgerceker on 12/7/15.
- */
-
-public class GuineaPigPage extends PageBase {
+public class GuineaPigPage {
 
     @FindBy(linkText = "i am a link")
     private WebElement theActiveLink;
@@ -24,28 +21,44 @@ public class GuineaPigPage extends PageBase {
     @FindBy(id = "submit")
     private WebElement submitButton;
 
+    public WebDriver driver;
+    public static String url = "https://saucelabs-sample-test-frameworks.github.io/training-test-page";
+
+    public static GuineaPigPage visitPage(WebDriver driver) {
+        GuineaPigPage page = new GuineaPigPage(driver);
+        page.visitPage();
+        return page;
+    }
+
     public GuineaPigPage(WebDriver driver) {
         this.driver = driver;
+        PageFactory.initElements(driver, this);
     }
 
     public void visitPage() {
-        driver.get("https://saucelabs.com/test/guinea-pig");
+        this.driver.get(url);
     }
 
     public void followLink() {
-        clickLink(this.theActiveLink);
+        theActiveLink.click();
     }
 
     public void submitComment(String text) {
-        setTextAreaInputValue(this.commentsTextAreaInput, text);
-        clickButton(this.submitButton);
+        commentsTextAreaInput.sendKeys(text);
+        submitButton.click();
 
         // Race condition for time to populate yourCommentsSpan
-        WebDriverWait wait = new WebDriverWait(this.driver, 15);
+        WebDriverWait wait = new WebDriverWait(driver, 15);
         wait.until(ExpectedConditions.textToBePresentInElement(yourCommentsSpan, text));
     }
 
     public String getSubmittedCommentText() {
-        return this.yourCommentsSpan.getText();
+        return yourCommentsSpan.getText();
     }
+
+    public boolean isOnPage() {
+        String title = "I am a page title - Sauce Labs";
+        return driver.getTitle() == title;
+    }
+
 }
