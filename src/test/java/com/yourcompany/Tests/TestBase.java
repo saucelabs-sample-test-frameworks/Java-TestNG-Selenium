@@ -10,9 +10,11 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.ITestResult;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Listeners;
+import org.testng.Assert;
 
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -41,6 +43,13 @@ public class TestBase  {
      * ThreadLocal variable which contains the Sauce Job Id.
      */
     private ThreadLocal<String> sessionId = new ThreadLocal<String>();
+
+    /** Checks that authentication credentials have been set */
+    @BeforeSuite
+    private void checkForCredentials(){
+        Assert.assertNotNull(username, "The SAUCE_USERNAME environment variable must be set.");
+        Assert.assertNotNull(accesskey, "The SAUCE_ACCESS_KEY environment variable must be set.");
+    }
 
     /**
      * DataProvider that explicitly sets the browser combinations to be used.
