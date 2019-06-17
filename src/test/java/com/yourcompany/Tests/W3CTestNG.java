@@ -1,7 +1,5 @@
 package com.yourcompany.Tests;
 
-import com.yourcompany.Pages.GuineaPigPage;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.edge.EdgeOptions;
@@ -74,9 +72,9 @@ public class W3CTestNG {
     public void simpleCase(MutableCapabilities options, String browserVersion, String platformName) throws MalformedURLException {
         this.createDriverOptions(options, browserVersion, platformName);
 
-        GuineaPigPage page = GuineaPigPage.visitPage(driver);
-        String title = page.driver.getTitle();
+        this.driver.get("http://www.saucedemo.com");
+        String title = this.driver.getTitle();
 
-        Assert.assertTrue(title.contains("Sauce"));
+        Assert.assertTrue(title.contains("Swag Labs"));
     }
 }

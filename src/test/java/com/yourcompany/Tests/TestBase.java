@@ -1,9 +1,5 @@
 package com.yourcompany.Tests;
 
-import com.saucelabs.common.SauceOnDemandAuthentication;
-import com.saucelabs.common.SauceOnDemandSessionIdProvider;
-import com.saucelabs.testng.SauceOnDemandAuthenticationProvider;
-import com.saucelabs.testng.SauceOnDemandTestListener;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.CapabilityType;
@@ -12,7 +8,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.DataProvider;
-import org.testng.annotations.Listeners;
 
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -35,7 +30,7 @@ public class TestBase  {
     /**
      * ThreadLocal variable which contains the  {@link WebDriver} instance which is used to perform browser interactions with.
      */
-    private ThreadLocal<WebDriver> webDriver = new ThreadLocal<WebDriver>();
+    private ThreadLocal<WebDriver> driver = new ThreadLocal<WebDriver>();
 
     /**
      * ThreadLocal variable which contains the Sauce Job Id.
@@ -51,10 +46,8 @@ public class TestBase  {
     @DataProvider(name = "hardCodedBrowsers", parallel = true)
     public static Object[][] sauceBrowserDataProvider(Method testMethod) {
         return new Object[][]{
-                new Object[]{"MicrosoftEdge", "17.17134", "Windows 10"},
                 new Object[]{"firefox", "latest", "Windows 10"},
-                new Object[]{"internet explorer", "11", "Windows 8.1"},
-                new Object[]{"safari", "12.0", "macOS 10.13"},
+                new Object[]{"safari", "12.1", "macOS 10.13"},
                 new Object[]{"chrome", "70", "macOS 10.13"},
                 new Object[]{"firefox", "latest-1", "Windows 7"},
         };
@@ -63,8 +56,8 @@ public class TestBase  {
     /**
      * @return the {@link WebDriver} for the current thread
      */
-    public WebDriver getWebDriver() {
-        return webDriver.get();
+    public WebDriver getDriver() {
+        return driver.get();
     }
 
     /**
@@ -88,7 +81,7 @@ public class TestBase  {
      * @throws MalformedURLException if an error occurs parsing the url
      */
     protected void createDriver(String browser, String version, String os, String methodName)
-            throws MalformedURLException, UnexpectedException {
+            throws MalformedURLException {
         DesiredCapabilities capabilities = new DesiredCapabilities();
 
         // set desired capabilities to launch appropriate browser on Sauce
@@ -102,12 +95,12 @@ public class TestBase  {
         }
 
         // Launch remote browser and set it as the current thread
-        webDriver.set(new RemoteWebDriver(
+        driver.set(new RemoteWebDriver(
                 new URL("https://" + username + ":" + accesskey + "@ondemand.saucelabs.com/wd/hub"),
                 capabilities));
 
         // set current sessionId
-        String id = ((RemoteWebDriver) getWebDriver()).getSessionId().toString();
+        String id = ((RemoteWebDriver) getDriver()).getSessionId().toString();
         sessionId.set(id);
     }
 
@@ -118,11 +111,11 @@ public class TestBase  {
      */
     @AfterMethod
     public void tearDown(ITestResult result) throws Exception {
-        ((JavascriptExecutor) webDriver.get()).executeScript("sauce:job-result=" + (result.isSuccess() ? "passed" : "failed"));
-        webDriver.get().quit();
+        ((JavascriptExecutor) driver.get()).executeScript("sauce:job-result=" + (result.isSuccess() ? "passed" : "failed"));
+        driver.get().quit();
     }
 
     protected void annotate(String text) {
-        ((JavascriptExecutor) webDriver.get()).executeScript("sauce:context=" + text);
+        ((JavascriptExecutor) driver.get()).executeScript("sauce:context=" + text);
     }
 }
