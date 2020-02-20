@@ -22,7 +22,7 @@ import java.rmi.UnexpectedException;
 /**
  * Simple TestNG test which demonstrates being instantiated via a DataProvider in order to supply multiple browser combinations.
  *
- * @author Neil Manvar
+ * @authors Neil Manvar, Dylan Lacey
  */
 public class TestBase  {
 
@@ -35,12 +35,57 @@ public class TestBase  {
     /**
      * ThreadLocal variable which contains the  {@link WebDriver} instance which is used to perform browser interactions with.
      */
-    private ThreadLocal<WebDriver> webDriver = new ThreadLocal<WebDriver>();
+    private InheritableThreadLocal<WebDriver> webDriver = new InheritableThreadLocal<>();
 
     /**
      * ThreadLocal variable which contains the Sauce Job Id.
      */
-    private ThreadLocal<String> sessionId = new ThreadLocal<String>();
+    private ThreadLocal<String> sessionId = new ThreadLocal<>();
+
+    /**
+     * ThreadLocal variable which contains the Shutdown Hook instance for this Thread's WebDriver.
+     *
+     * Registered just before Browser creation, de-registered after 'quit' is called.
+     */
+    private ThreadLocal<Thread> shutdownHook = new ThreadLocal<>();
+
+    /**
+     * Creates the shutdownHook, or returns an existing copy.
+     */
+    private Thread getShutdownHook() {
+        if (shutdownHook.get() == null) {
+            shutdownHook.set( new Thread(() -> {
+                try {
+                    if (webDriver.get() != null) webDriver.get().quit();
+                } catch (org.openqa.selenium.NoSuchSessionException ignored) { } // Don't care if session already closed
+            }));
+        }
+        return shutdownHook.get();
+    }
+
+    /**
+     * Registers the shutdownHook with the runtime.
+     *
+     * Ignoring exceptions on registration; They mean the VM is already shutting down and it's too late.
+     */
+    private void registerShutdownHook() {
+        try {
+            Runtime.getRuntime().addShutdownHook(getShutdownHook());
+        } catch (IllegalStateException ignored) {} // Thrown if a hook is added while shutting down; We don't care
+    }
+
+    /**
+     * De-registers the shutdownHook. This allows the GC to remove the thread and avoids double-quitting.
+     *
+     * Silently swallows exceptions if the VM is already shutting down; it's too late.
+     */
+    private void deregisterShutdownHook() {
+        if (shutdownHook.get() != null) {
+            try {
+                Runtime.getRuntime().removeShutdownHook(getShutdownHook());
+            } catch (IllegalStateException ignored) { } // VM already shutting down; Irrelevant
+        }
+    }
 
     /**
      * DataProvider that explicitly sets the browser combinations to be used.
@@ -106,6 +151,8 @@ public class TestBase  {
                 new URL("https://" + username + ":" + accesskey + "@ondemand.saucelabs.com/wd/hub"),
                 capabilities));
 
+        registerShutdownHook();
+
         // set current sessionId
         String id = ((RemoteWebDriver) getWebDriver()).getSessionId().toString();
         sessionId.set(id);
@@ -120,6 +167,7 @@ public class TestBase  {
     public void tearDown(ITestResult result) throws Exception {
         ((JavascriptExecutor) webDriver.get()).executeScript("sauce:job-result=" + (result.isSuccess() ? "passed" : "failed"));
         webDriver.get().quit();
+        deregisterShutdownHook();
     }
 
     protected void annotate(String text) {
